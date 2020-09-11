@@ -16,20 +16,20 @@
 
 locals {
   replicas = {
-    for x in var.read_replicas : "${var.name}-replica${var.read_replica_name_suffix}${x.name}" => x
+    for x in var.read_replicas : "${x.name}${var.read_replica_name_suffix}" => x
   }
 }
 
 resource "google_sql_database_instance" "replicas" {
   for_each             = local.replicas
   project              = var.project_id
-  name                 = "${local.master_instance_name}-replica${var.read_replica_name_suffix}${each.value.name}"
+  name                 = "${each.value.name}${var.read_replica_name_suffix}"
   database_version     = var.database_version
   region               = join("-", slice(split("-", lookup(each.value, "zone", var.zone)), 0, 2))
   master_instance_name = google_sql_database_instance.default.name
 
   replica_configuration {
-    failover_target = false
+    failover_target = lookup(each.value, "failover_target", var.failover_target)
   }
 
   settings {

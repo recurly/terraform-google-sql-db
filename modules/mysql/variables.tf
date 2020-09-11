@@ -30,6 +30,12 @@ variable "random_instance_name" {
   default     = false
 }
 
+variable "failover_target" {
+  type        = bool
+  description = "Sets random suffix at the end of the Cloud SQL resource name"
+  default     = false
+}
+
 // required
 variable "database_version" {
   description = "The database version to use"
@@ -172,6 +178,7 @@ variable "read_replicas" {
     zone            = string
     disk_type       = string
     disk_autoresize = bool
+    failover_target = bool
     disk_size       = string
     user_labels     = map(string)
     database_flags = list(object({
